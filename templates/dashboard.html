@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" integrity="sha512-U9MNnQe6YHQrcQ5w3eM0H3yCpL9EsH2a6fsW1Q5Qyf5l+fRMt/B5FOt9K7Yo40u6rcFbBxBr42mpUS7N3r9dyw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js" integrity="sha512-jyrzUUvf8V6j2s0mxEhG9hDBMWRM19CTTnRj2efKFAe0ImJ1Ijj+EkmmALZaTC7LzvZuhf5xySOD5Cw2Eck5aw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/headers/">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f1f1;
+            padding: 20px;
+        }
+
+        .container-plot {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .chart-container canvas {
+            width: 400px;
+            height: 400px;
+        }
+
+        .centered-chart-container {
+            text-align: center;
+            margin-top: 50px;
+            padding-left:150px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="px-3 py-2 bg-dark text-white">
+          <div class="container">
+    
+    
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+              <div class="">
+                <a href="/homepage" class="navbar-brand text-white text-white"><b>Home</b></a>
+              </div>
+              <a href="/" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
+                <!-- <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"/></svg> -->
+              </a>
+    
+              <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
+    
+                <li><a href="/login" class="nav-link text-white">Logout</a></li>
+                <!-- <li><a href="/crops" class="nav-link text-secondary">Logout</a></li> -->
+    
+              </ul>
+            </div>
+          </div>
+        </div>
+    
+      </header>
+
+
+    <div class="container-plot">
+        
+
+        <div class="content">
+            <h2></h2>
+            <p>
+                
+            </p>
+
+        </div>
+        
+        <br>
+        <h1>Domain Distribution Dashboard</h1>
+        <br>
+        <div class="chart-container">
+            <canvas id="pieChart" width="400" height="400"></canvas>
+            <canvas id="barChart" width="400" height="400"></canvas>
+        </div>
+
+        <br>
+        <br>
+        <br>
+
+        <h1>Complaints Dashboard</h1>
+        <div class="centered-chart-container">
+            
+            <canvas id="complaintsChart" width="800" height="400"></canvas>
+        </div>
+
+
+        <br>
+        <br>
+        <br>
+
+    </div>
+
+    <script>
+        // Get the day and count data passed from Flask
+        var days = {{ days | tojson }};
+        var counts = {{ counts | tojson }};
+        var domains = {{ domains | tojson }};
+        var daywise_counts = {{ daywise_counts | tojson }};
+
+
+         // Get the canvas element for the pie chart
+         var pieCtx = document.getElementById('pieChart').getContext('2d');
+
+         // Create the pie chart
+         var pieChart = new Chart(pieCtx, {
+             type: 'pie',
+             data: {
+                 labels: domains,
+                 datasets: [{
+                     data: counts,
+                     backgroundColor: [
+                         '#ff6384',
+                         '#36a2eb',
+                         '#ffce56',
+                         '#4bc0c0',
+                         '#9966ff',
+                         '#ff9f40'
+                     ]
+                 }]
+             },
+             options: {
+                 responsive: false,
+                 title: {
+                     display: true,
+                     text: 'Domain Distribution (Pie Chart)'
+                 }
+             }
+         });
+ 
+         // Get the canvas element for the bar chart
+         var barCtx = document.getElementById('barChart').getContext('2d');
+
+        // Create the bar chart
+        var barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: domains,
+                datasets: [{
+                    data: counts,
+                    backgroundColor: [
+                        '#ff6384',
+                        '#36a2eb',
+                        '#ffce56',
+                        '#4bc0c0',
+                        '#9966ff',
+                        '#ff9f40'
+                    ]
+                }]
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Complaints per Domain'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 5
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Count'
+                        }
+                    },
+                    x: {
+                        scaleLabel: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+
+
+        // Get the canvas element for the bar chart
+        var ctx = document.getElementById('complaintsChart').getContext('2d');
+
+        // Create the bar chart
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: days,
+                datasets: [{
+                    label: 'Complaints',
+                    data: daywise_counts,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        stepSize: 5
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Complaints per Day'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
